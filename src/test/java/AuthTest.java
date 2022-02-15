@@ -1,9 +1,13 @@
+import com.github.javafaker.Faker;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
+
+import java.util.Locale;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.$;
@@ -21,7 +25,6 @@ public class AuthTest {
 
     @BeforeAll
     static void setUpAll() {
-
         given()
                 .spec(requestSpec) // указываем, какую спецификацию используем
                 .body(new RegistrationDto("vasya", "password", "active")) // передаём в теле объект, который будет преобразован в JSON
@@ -29,8 +32,6 @@ public class AuthTest {
                 .post("/api/system/users") // на какой путь, относительно BaseUri отправляем запрос
                 .then() // "тогда ожидаем"
                 .statusCode(200); // код 200 OK
-
-        open("http://localhost:9999");
     }
 
     @Test
@@ -43,7 +44,10 @@ public class AuthTest {
                 .then()
                 .statusCode(200);
 
+        open("http://localhost:9999");
+        $(".input__control[name=login]").doubleClick().sendKeys(Keys.BACK_SPACE);
         $(".input__control[name=login]").setValue(user.getLogin());
+        $(".input__control[name=password]").doubleClick().sendKeys(Keys.BACK_SPACE);
         $(".input__control[name=password]").setValue(user.getPassword());
         $("button").click();
         $(".notification__title").shouldHave(text("Ошибка"));
@@ -53,8 +57,11 @@ public class AuthTest {
 
     @Test
     public void userExistsTest() {
+        open("http://localhost:9999");
         RegistrationDto user = new RegistrationDto("vasya", "password", "active");
+        $(".input__control[name=login]").doubleClick().sendKeys(Keys.BACK_SPACE);
         $(".input__control[name=login]").setValue(user.getLogin());
+        $(".input__control[name=password]").doubleClick().sendKeys(Keys.BACK_SPACE);
         $(".input__control[name=password]").setValue(user.getPassword());
         $("button").click();
         $("h2").shouldHave(text("Личный кабинет"));
@@ -62,8 +69,11 @@ public class AuthTest {
 
     @Test
     public void invalidLoginTest() {
+        open("http://localhost:9999");
         RegistrationDto user = new RegistrationDto("vas", "password", "active");
+        $(".input__control[name=login]").doubleClick().sendKeys(Keys.BACK_SPACE);
         $(".input__control[name=login]").setValue(user.getLogin());
+        $(".input__control[name=password]").doubleClick().sendKeys(Keys.BACK_SPACE);
         $(".input__control[name=password]").setValue(user.getPassword());
         $("button").click();
         $(".notification__title").shouldHave(text("Ошибка"));
@@ -73,8 +83,11 @@ public class AuthTest {
 
     @Test
     public void invalidPassTest() {
+        open("http://localhost:9999");
         RegistrationDto user = new RegistrationDto("vasya", "pass", "active");
+        $(".input__control[name=login]").doubleClick().sendKeys(Keys.BACK_SPACE);
         $(".input__control[name=login]").setValue(user.getLogin());
+        $(".input__control[name=password]").doubleClick().sendKeys(Keys.BACK_SPACE);
         $(".input__control[name=password]").setValue(user.getPassword());
         $("button").click();
         $(".notification__title").shouldHave(text("Ошибка"));
